@@ -1,6 +1,6 @@
 <div style='font-family: Arial, Helvetica, sans-serif'>
 <h1>DISCLAIMER</h1>
-<p>This code is provided AS-IS. It is the result of work done exploring the Google Glass platform and is inspired by code provided along with the Google Glass Mirror API documentation available @ https://developers.google.com/glass/develop/mirror/quickstart/php. For a Quick Start guide to using the Google Glass Mirror API, visit https://developers.google.com/glass/develop/mirror/quickstart/.</p>
+<p>This code is provided AS-IS. It is the result of work done exploring the Google Glass platform and is inspired by code provided along with the Google Glass Mirror API documentation available @ <a href="https://developers.google.com/glass/develop/mirror/quickstart/php" target="_blank">https://developers.google.com/glass/develop/mirror/quickstart/php</a>. For a Quick Start guide to using the Google Glass Mirror API, visit <a href="https://developers.google.com/glass/develop/mirror/quickstart/" target="_blank">https://developers.google.com/glass/develop/mirror/quickstart/</a>.</p>
 <h1>REQUIREMENTS</h1>
 <ul>
   <li>CakePHP framework, available at <a href="http://cakephp.org">http://cakephp.org</a></li>
