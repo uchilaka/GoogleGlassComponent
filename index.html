@@ -34,8 +34,7 @@
 <h1>
 <a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>REQUIREMENTS</h1>
 <ul>
-<li>Working knowledge of coding in CakePHP </li>
-  <li>CakePHP framework, available at <a href="http://cakephp.org">http://cakephp.org</a>
+<li>CakePHP framework, available at <a href="http://cakephp.org">http://cakephp.org</a>
 </li>
   <li>Google PHP Client API </li>
   <li>
@@ -68,18 +67,18 @@
 <a name="functions" class="anchor" href="#functions"><span class="octicon octicon-link"></span></a>FUNCTIONS</h1>
 <blockquote>
   <h3>
-<a name="connectcontroller-controller-config-scopes-api_mode" class="anchor" href="#connectcontroller-controller-config-scopes-api_mode"><span class="octicon octicon-link"></span></a>connect(Controller $controller, $config, $scopes, $api_mode)</h3>
+<a name="connectcontroller-config-scopes-api_mode" class="anchor" href="#connectcontroller-config-scopes-api_mode"><span class="octicon octicon-link"></span></a>connect($controller, $config, $scopes, $api_mode)</h3>
   <p> This method is most likey
     be well used within your project. It initializes your authentication attempt againt the user's Google ID, and accepts the following arguments: </p>
   <blockquote>
-    <p>controller: Use the $this variable to pass your controller into the component for controller-level callbacks</p>
-    <p>$config: This is an associative array with the following parameters: </p>
+    <p><strong>controller</strong>: Use the $this variable to pass your controller into the component for controller-level callbacks</p>
+    <p><strong>config</strong>: This is an associative array with the following parameters: </p>
     <blockquote>
-      <p>client_id: Your Google API client ID</p>
-      <p>client_secret: Your Google API secret</p>
-      <p>redirect_url: Your success redirect url once the authentication action is completed. This url MUST be included in the list of accepted callbacks in your google console</p>
+      <p><strong>client_id</strong>: Your Google API client ID</p>
+      <p><strong>client_secret</strong>: Your Google API secret</p>
+      <p><strong>redirect_url</strong>: Your success redirect url once the authentication action is completed. This url MUST be included in the list of accepted callbacks in your google console</p>
     </blockquote>
-    <p>api_mode: This is a boolean variable. If set to true, the component will return an associative array with a <em>success</em> index that indicates whether the auth attempt was successful or not. This will be useful if you are authenticating via an API and would like to parse the associate array to a JSON string (for instance) instead of the auto-redirect action.</p>
+    <p><strong>api_mode</strong>: This is a boolean variable. If set to true, the component will return an associative array with a <em>success</em> index that indicates whether the auth attempt was successful or not. This will be useful if you are authenticating via an API and would like to parse the associate array to a JSON string (for instance) instead of the auto-redirect action.</p>
   </blockquote>
   <h3>
 <a name="isready" class="anchor" href="#isready"><span class="octicon octicon-link"></span></a>isReady()</h3>
