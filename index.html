@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>GoogleGlassComponent by uchilaka</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>GoogleGlassComponent</h1>
+        <p>CakePHP Component for the Google Glass Mirror API</p>
+
+        <p class="view"><a href="https://github.com/uchilaka/GoogleGlassComponent">View the Project on GitHub <small>uchilaka/GoogleGlassComponent</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/uchilaka/GoogleGlassComponent/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/uchilaka/GoogleGlassComponent/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/uchilaka/GoogleGlassComponent">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <div>
+<h1>
+<a name="disclaimer" class="anchor" href="#disclaimer"><span class="octicon octicon-link"></span></a>DISCLAIMER</h1>
+<p>This code is provided AS-IS. It is the result of work done exploring the Google Glass platform and is inspired by code provided along with the Google Glass Mirror API documentation available @ https://developers.google.com/glass/develop/mirror/quickstart/php. For a Quick Start guide to using the Google Glass Mirror API, visit https://developers.google.com/glass/develop/mirror/quickstart/.</p>
+<h1>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>REQUIREMENTS</h1>
+<ul>
+<li>Working knowledge of coding in CakePHP </li>
+  <li>CakePHP framework, available at <a href="http://cakephp.org">http://cakephp.org</a>
+</li>
+  <li>Google PHP Client API </li>
+  <li>
+    A working knowledge of coding with CakePHP. The CakePHP documentation can be found here: <a href="http://book.cakephp.org/2.0/en/index.html" target="_blank">http://book.cakephp.org/2.0/en/index.html</a>
+</li>
+    <li>A Google Console Project with OAuth credentials. To setup your google console project, visit <a href="http://cloud.google.com" target="_blank">http://cloud.google.com</a>.</li>
+    <li>The Google_Oauth2Service class, available in the <a href="https://code.google.com/p/google-api-php-client/" target="_blank">Google API Client Library for PHP</a> library </li>
+    <li>The Google_Client class, also available in the <a href="https://code.google.com/p/google-api-php-client/" target="_blank">Google API Client Library for PHP</a> library</li>
+    <li>The Google_MirrorService class, also available in the <a href="https://code.google.com/p/google-api-php-client/" target="_blank">Google API Client Library for PHP</a> library</li>
+  
+</ul>
+<h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>INSTALLATION</h1>
+<p>Copy the component to your /&lt;Application Root&gt;/app/Controller/Component/ directory, or any other directory bootstrapped to search for components.</p>
+<p>Update the paths in the component file to those for each of the required classes. BE SURE TO MAKE THE PATH TO THE SQLITE DATBASE WRITABLE BY YOUR WEB USER ACCOUNT.</p>
+<p>Replace the paths to both the Google_Oauth2Service and Google_Client class files with the correct path on your server - e.g. /var/www/libraries/google/google-api-client/src/contrib/&lt;ClassFile&gt; assuming that is where you have the Google API library installed on your server</p>
+<p>That's it! You're ready to start using the component within your CakePHP controllers. </p>
+<h1>
+<a name="using-the-component" class="anchor" href="#using-the-component"><span class="octicon octicon-link"></span></a>USING THE COMPONENT</h1>
+<p>Include the component name in your $components array </p>
+<ul>
+<blockquote> public $components = array('GoogleOauth2'); </blockquote>
+</ul>
+<p>Next, use the <a href="#connect">connect()</a> method to initialize the component when you are ready to attempt authentication against Google ID. See the method reference <a href="#connect">below</a> for accepted arguments.</p>
+<h2>
+<a name="loading-components-on-the-fly" class="anchor" href="#loading-components-on-the-fly"><span class="octicon octicon-link"></span></a>LOADING COMPONENTS ON THE FLY</h2>
+<p>You can load the component on the fly in your CakePHP application using the following syntax:</p>
+<blockquote>$this-&gt;GoogleAuth = $this-&gt;Components-&gt;load('GoogleGlass'); </blockquote>
+<h1>
+<a name="functions" class="anchor" href="#functions"><span class="octicon octicon-link"></span></a>FUNCTIONS</h1>
+<blockquote>
+  <h3>
+<a name="connectcontroller-controller-config-scopes-api_mode" class="anchor" href="#connectcontroller-controller-config-scopes-api_mode"><span class="octicon octicon-link"></span></a>connect(Controller $controller, $config, $scopes, $api_mode)</h3>
+  <p> This method is most likey
+    be well used within your project. It initializes your authentication attempt againt the user's Google ID, and accepts the following arguments: </p>
+  <blockquote>
+    <p>controller: Use the $this variable to pass your controller into the component for controller-level callbacks</p>
+    <p>$config: This is an associative array with the following parameters: </p>
+    <blockquote>
+      <p>client_id: Your Google API client ID</p>
+      <p>client_secret: Your Google API secret</p>
+      <p>redirect_url: Your success redirect url once the authentication action is completed. This url MUST be included in the list of accepted callbacks in your google console</p>
+    </blockquote>
+    <p>api_mode: This is a boolean variable. If set to true, the component will return an associative array with a <em>success</em> index that indicates whether the auth attempt was successful or not. This will be useful if you are authenticating via an API and would like to parse the associate array to a JSON string (for instance) instead of the auto-redirect action.</p>
+  </blockquote>
+  <h3>
+<a name="isready" class="anchor" href="#isready"><span class="octicon octicon-link"></span></a>isReady()</h3>
+  <p> This returns true or false after a <a href="#connect">connect()</a> call for a success or failure to authenticate. </p>
+  <h3>
+<a name="getauthurl" class="anchor" href="#getauthurl"><span class="octicon octicon-link"></span></a>getAuthUrl()</h3>
+  <p> Returns the authentication Url against Google's OAuth API. Is useful if you are handling redirection manually. In this case, the <em>api_mode<em> variable of your <a href="#connect">connect()</a> function can
+    come in handy to turn off the auto-redirect when authentication is needed.</em></em></p>
+  <h3>
+<a name="getuser" class="anchor" href="#getuser"><span class="octicon octicon-link"></span></a>getUser()</h3>
+  <p> Will return an associate array of the session user data. </p>
+  <h3>
+<a name="getuserid" class="anchor" href="#getuserid"><span class="octicon octicon-link"></span></a>getUserId()</h3>
+  <p> Will return the Google User ID from the session user array. </p>
+  <h3>
+<a name="cleanuser" class="anchor" href="#cleanuser"><span class="octicon octicon-link"></span></a>cleanUser()</h3>
+  <p> Useful for logging out. Call in your <em>logout()</em> controller function to delete the google user data from the session. </p>
+  <h3>
+<a name="gettokens" class="anchor" href="#gettokens"><span class="octicon octicon-link"></span></a>getTokens()</h3>
+  <p> Returns a JSON string of the tokens returned on successful authentication and stored in the session array. </p>
+  <h3>
+<a name="init_db" class="anchor" href="#init_db"><span class="octicon octicon-link"></span></a>init_db()</h3>
+  <p>Function for initializing the sqlite database. </p>
+  <h3>
+<a name="get_credentialsuserid" class="anchor" href="#get_credentialsuserid"><span class="octicon octicon-link"></span></a>get_credentials($userid)</h3>
+  <p>Will return a JSON string with the credentials from the Google_Client authentication in the <em>connect()</em> method. </p>
+  <ul>
+<li>
+<strong>userid:</strong> This is the Google ID of your authenticated user, stored in the session.</li>
+  </ul>
+<h3>
+<a name="store_credentialsuserid-token-" class="anchor" href="#store_credentialsuserid-token-"><span class="octicon octicon-link"></span></a>store_credentials($userid, $token) </h3>
+  <p>Will store the <em>$token</em> passed against the <em>$userid</em> in the credentials table. USE WITH CAUTION - PREFERRABLY WITHIN THE authenticate() PRIVATE METHOD ONLY.</p>
+  <ul>
+<li>
+<strong>userid:</strong> This is the Google ID of your authenticated user, stored in the session.</li>
+    <li>
+<strong>$token:</strong> The JSON format string returned after a successul authentication</li>
+  </ul>
+<h3>
+<a name="verify_credentialscontroller-credentials-api_mode" class="anchor" href="#verify_credentialscontroller-credentials-api_mode"><span class="octicon octicon-link"></span></a>verify_credentials($controller, $credentials, $api_mode)</h3>
+  <p>Used by the <em>authenticate</em> method to verify the session-stored credentials when a page is re-loaded.</p>
+  <ul>
+<li>
+<strong>controller: </strong>Pass your host controller using the <em>$this</em> variable in CakePHP</li>
+    <li>
+<strong>credentials:</strong> This is the JSON format string returned as the token which you exchange for your <em>code</em> in the OAuth flow.</li>
+    <li>
+<strong>api_mode:</strong> used to control the auto-redirect function of the <em>authenticate</em>() and <em>connect</em>() methods. Will return an associate array with a <em>success </em>index instead.</li>
+  </ul>
+<h3>
+<a name="bootstrap_new_user-customize" class="anchor" href="#bootstrap_new_user-customize"><span class="octicon octicon-link"></span></a>bootstrap_new_user() *Customize</h3>
+  <p>This method will instantiate a new user as well as insert a <em>welcome </em>slide in their Glass Timeline. BE SURE TO CHANGE THE PARAMETERS HERE TO THOSE FOR YOUR PURPOSES.</p>
+  <h3>
+<a name="insert_contactcontact_name-display_name-icon_url" class="anchor" href="#insert_contactcontact_name-display_name-icon_url"><span class="octicon octicon-link"></span></a>insert_contact($contact_name, $display_name, $icon_url)</h3>
+  <p>Inserts a contact for the authenticated user</p>
+  <ul>
+<li>
+<strong>contact_name: </strong>The name of the contact to be inserted</li>
+    <li>
+<strong>display_name: </strong>The display name.</li>
+    <li>
+<strong>icon_url: </strong>The web link for an icon to represent this contact.</li>
+  </ul>
+<h3>
+<a name="subscribe_to_notificationscollection-user_token-callback_url-" class="anchor" href="#subscribe_to_notificationscollection-user_token-callback_url-"><span class="octicon octicon-link"></span></a>subscribe_to_notifications($collection, $user_token, $callback_url) </h3>
+  <p><strong>collection:</strong> A string representing the collection you want to insert a notificaiton to e.g. <em>"timeline"</em></p>
+  <p><strong>user_token:</strong> as returned by the <em>getTokens()</em> method</p>
+  <p><strong>callback_url:</strong> the resource link for Google glass regarding this notification</p>
+  <h3>
+<a name="insert_timeline_itemtimeline_item--content_type-attachment--" class="anchor" href="#insert_timeline_itemtimeline_item--content_type-attachment--"><span class="octicon octicon-link"></span></a>insert_timeline_item($timeline_item <em>[, $content_type, $attachment ] </em>)</h3>
+  <p>inserts a pre-built timeline item into the user's glass timeline. The <em>$timeline_item</em> variable must be of type <em>Google_TimelineItem</em>. See the documentation for the Glass Mirror API for details: https://developers.google.com/glass/v1/reference/timeline</p>
+  <ul>
+<li>
+<strong>timeline_item:</strong> An instance of the Google_TimelineItem class with parameters populated using the GET methods.</li>
+    <li>
+<strong>content_type (optional):</strong> The MIME type of the timeline item. For a list of allowed MIME types, refer to the Mirror API Documentation: https://developers.google.com/glass/v1/reference/timeline/insert. For details, review the Mirror API documentation, specifically the functions in the Google_TimelineItem class, defined in the Google_MirrorService file in the Google PHP API: https://code.google.com/p/google-api-php-client/. </li>
+    <li>
+<strong>attachment (optional):</strong> An attachment for the timeline item. For details, review the Mirror API documentation, specifically the functions in the Google_TimelineItem class, defined in the Google_MirrorService file in the Google PHP API: https://code.google.com/p/google-api-php-client/. </li>
+  </ul>
+<h3>
+<a name="delete_timeline_itemservice-item_id" class="anchor" href="#delete_timeline_itemservice-item_id"><span class="octicon octicon-link"></span></a>delete_timeline_item($service, $item_id)</h3>
+  <p>Deletes an item from the user's timeline. </p>
+  <ul>
+<li>
+<strong>service:</strong> An instance of the Google_MirrorService class as returned by the <em>getService()</em> method.</li>
+    <li>
+<strong>item_id:</strong>The ID for the item to be deleted.</li>
+  </ul>
+<h3>
+<a name="delete_contactcontact_id" class="anchor" href="#delete_contactcontact_id"><span class="octicon octicon-link"></span></a>delete_contact($contact_id)</h3>
+  <p>Delete a contact.</p>
+  <ul>
+<li>
+<strong>contact_id:</strong> The ID for the stored contact.</li>
+  </ul>
+</blockquote>
+
+  <h1>
+<a name="questions" class="anchor" href="#questions"><span class="octicon octicon-link"></span></a>QUESTIONS?</h1>
+  <p> Reach out @ <a href="https://twitter.com/uchechilaka" title="WebsiteInAPage on Twitter" target="_blank">https://twitter.com/websiteinapage</a>. I'll do my best to respond in a timely fasion. </p>
+</div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/uchilaka">uchilaka</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-47459054-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
