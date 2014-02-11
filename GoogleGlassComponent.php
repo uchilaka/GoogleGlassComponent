@@ -1,9 +1,14 @@
 <?php
 
-// embedded PHP_VENDOR_BASE 
+// path to dir of vendor libraries  
 // define("PHP_VENDOR_BASE", ABS_ROOT . 'assets/common/php/');
+// 
+// #Path to SQLite database file - MUST be writable by application user!
 // define("SQLITE_DB", ABS_ROOT . 'slidesonglass' . DS . 'res' . DS . 'database.sqlite');
+// 
 // define("GLASS_BASE_URL", APP_BASE . 'slides/glass');
+
+// declare unique app namespace APP_NAME
 
 // # Path to Google_Client class in Google PHP API library
 require_once PHP_VENDOR_BASE . 'google' . DS . 'google-api-php-client' . DS . 'src' . DS . "Google_Client.php";
@@ -11,8 +16,6 @@ require_once PHP_VENDOR_BASE . 'google' . DS . 'google-api-php-client' . DS . 's
 require_once PHP_VENDOR_BASE . 'google' . DS . 'google-api-php-client' . DS . 'src' . DS . "contrib" . DS . "Google_MirrorService.php";
 // # Path to Google_Oauth2Service class in Google PHP API library
 require_once PHP_VENDOR_BASE . 'google' . DS . 'google-api-php-client' . DS . 'src' . DS . "contrib" . DS . "Google_Oauth2Service.php";
-// #Path to SQLite database file - MUST be writable by application user!
-define('SQLITE_DB', 'var' . DS . 'www' . DS . 'sqlitedb' . DS . 'database.sqlite');
 
 App::uses('Component', 'Controller');
 App::uses('Application', 'Model');
@@ -53,8 +56,11 @@ class GoogleGlassComponent extends Component {
                 $this->service = new Google_MirrorService($this->google);
                 $this->oauth = new Google_Oauth2Service($this->google);
                 $this->google->setUseObjects(true);
-                $this->verify_credentials($controller, $credentials, $api_mode);
-                $this->ready = true;
+                /** @TODO Change check returned user object **/
+                $user = $this->verify_credentials($controller, $credentials, $api_mode);
+                if(!empty($user)):
+                    $this->ready = true;
+                endif;
             } catch (Exception $ex) {
                 if(!$api_mode):
                     $controller->redirect($this->getAuthUrl());
@@ -71,7 +77,6 @@ class GoogleGlassComponent extends Component {
         $this->user = $this->verify_credentials($controller, $token);
         if(!empty($this->user)):
             $this->store_credentials($this->user['id'], $token);
-            $this->setUserId($this->user['id']);
             $this->ready = true;
             if(!DEV):
                 $this->bootstrap_new_user();
@@ -96,9 +101,10 @@ class GoogleGlassComponent extends Component {
     
     function store_credentials($user_id, $credentials) {
       $db = $this->init_db();
-      $this->setUserId(SQLite3::escapeString(strip_tags($user_id)));
+      $this->setUser($user_id, $credentials);
+      $user_id = SQLite3::escapeString(strip_tags($user_id));
       $credentials = SQLite3::escapeString(strip_tags($credentials));
-      $insert = "insert or replace into credentials values ('{$this->getUserId()}', '$credentials')";
+      $insert = "insert or replace into credentials values ('$user_id', '$credentials')";
       $db->exec($insert);
     }
 
@@ -129,37 +135,35 @@ class GoogleGlassComponent extends Component {
         $this->google->setAccessToken($credentials);
         // attempt to refresh 
         $tokens = json_decode($credentials, true);
+        $now = time();
+        $expired = 0;
         // get a new access token
         if(!empty($tokens['refresh_token'])):
-            // get new access token
-            $this->google->refreshToken($tokens['refresh_token']);
+            $now = time();
+            $expired =$tokens['created']+$tokens['expires_in'];
+            if($now<$expired):
+                $this->google->refreshToken($tokens['refresh_token']);
+            endif;
         endif;
         
-        try {
-          return $this->oauth->userinfo->get();
-        } catch (Google_ServiceException $e) {
-            if ($e->getCode() == 401) {
-                  // This user may have disabled the Glassware on MyGlass.
-                  // Clean up the mess and attempt to re-auth.
-                  $this->cleanUser();
-                  if($api_mode):
-                      return array('success'=>false, 'message'=>$e->getMessage());
-                  else:
-                       $controller->redirect($this->getAuthUrl());
-                  endif;
-                  // $controller->redirect($this->config['redirect_url']);
-                  // echo $this->getAuthUrl();
-                  // exit;
-            } else {
-                  // Let it go...
-                  // throw $e;
-                  if($api_mode):
-                      return array('success'=>false, 'message'=>$e->getMessage());
-                  else:
-                      throw $e;
-                  endif;
-            }
-        }
+        if($now>$expired):
+            if(!$api_mode):
+                $controller->redirect($this->getAuthUrl());
+            else:
+                return array('success'=>false, 'message'=>'Authentication failed');
+            endif;
+        endif;
+        
+        $user = $this->oauth->userinfo->get();
+        if(empty($user)):
+            if($api_mode):
+                return array('success'=>false, 'message'=>'Authentication failed');
+            else:
+                $controller->redirect($this->getAuthUrl());
+            endif;
+        else:
+            return $user;
+        endif;
     }
     
     public function isReady() {
@@ -179,8 +183,9 @@ class GoogleGlassComponent extends Component {
     
     function bootstrap_new_user() {
         $timeline_item = new Google_TimelineItem();
-        $timeline_item->setText("Welcome to the Mirror API PHP Quick Start");
-        $this->insert_timeline_item($timeline_item, null, null);
+        $timeline_item->setText("Welcome to SlidesOnGlass");
+        $this->insert_timeline_item($timeline_item, 'image/png', file_get_contents(APP_BASE . "img/welcome-image.png"));
+        /** Explore adding contact details - email and such **/
         $this->insert_contact("slides-on-glass", "SlidesOnGlass",
             APP_BASE . "img/welcome-image.png");
         $this->subscribe_to_notifications("timeline", $this->getUserId(), APP_BASE . "api/callback/glass");
@@ -248,10 +253,6 @@ class GoogleGlassComponent extends Component {
         $service->timeline->delete($item_id);
     }
     
-    function getService() {
-        return $this->service;
-    }
-    
     function getAuthUrl() {
         try {
             $authUrl = $this->google->createAuthUrl();
@@ -263,33 +264,40 @@ class GoogleGlassComponent extends Component {
         }
     }
     
-    public function setUser($id) {
-        $_SESSION["gg_user"] = json_encode(array(
-          'tokens' => json_decode($tokens, true)
-        ));
+    public function setUser($id, $token) {
+        $_SESSION[APP_NAME . 'gg_user'] = array(
+            'id'=>$id,
+            'tokens'=>json_decode($token, true)
+        );
+    }
+    /*
+    public function setTokens($token) {
+        if(empty($_SESSION['gg_user'])):
+            $_SESSION['gg_user']= array();
+        endif;
+        $_SESSION['gg_user']['tokens'] = json_decode($token, true);
     }
     
     private function setUserId($id) {
         $_SESSION['gg_user']['id'] = $id;
     }
+    */
     
     private function getUserId() {
-        if(empty($_SESSION['gg_user'])):
-            throw new Exception("No user ID found in session.");
+        if(!empty($_SESSION[APP_NAME . 'gg_user']['id'])):
+            return $_SESSION[APP_NAME . 'gg_user']['id'];
         endif;
-        
-        return $_SESSION['gg_user']['id'];
     }
     
     function getUser() {
-        if (isset($_SESSION["gg_user"])) {
-          return $_SESSION["gg_user"];
+        if (isset($_SESSION[APP_NAME . "gg_user"])) {
+          return $_SESSION[APP_NAME . "gg_user"];
         }
         return NULL;
     }
     
     public function cleanUser() {
-        unset($_SESSION['gg_user']);
+        unset($_SESSION[APP_NAME . 'gg_user']);
     }
     
     public function getTokens() {
